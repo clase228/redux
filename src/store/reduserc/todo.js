@@ -1,9 +1,16 @@
-import { ADD_TODO, TOGGLE_TODO } from "../actions/types/todo";
+import { ADD_TODO, TOGGLE_TODO,DELETE_TODO,ORDER_TODO } from "../actions/types/todo";
 
 // 1.
+
+export const filters = {
+   ALL: "ALL",
+   COMPLETED: "COMPLETED",
+   NOT_COMPLETED: "NOT_COMPLETED",
+ };
 const initialState = {
   allIds: [],
   byIds: {},
+  typeFilter: filters.ALL
 };
 
 // 2.
@@ -13,7 +20,7 @@ export default function todoReducer(state = initialState, action) {
     case ADD_TODO: {
       // 4.
       const { id, content } = action.payload;
-
+      
       // 5.
       return {
         ...state,
@@ -25,7 +32,7 @@ export default function todoReducer(state = initialState, action) {
 
           [id]: {
             content,
-            complete: false,
+            completed: false,
           },
         },
       };
@@ -49,6 +56,35 @@ export default function todoReducer(state = initialState, action) {
       };
 
     }
+    case DELETE_TODO:{
+       const { id } = action.payload;
+
+       const id_del = {...state.byIds}
+    
+        for (const key in id_del) {
+            if (key === String(id)) {
+                delete id_del[id];
+            }
+        }
+    
+        const filteredIds = state.allIds.filter((item) =>  item !== id )
+        
+        
+        return {
+            ...state,
+            allIds: filteredIds,
+            ...state.byIds
+        };
+   }
+   case ORDER_TODO: {
+    return{
+      ...state,
+      ...state.allIds,
+      ...state.byIds,
+      typeFilter:action.payload
+    }
+   }
+   
 
     default:
       return state;
